@@ -1,5 +1,6 @@
 package nl.wtrlmn.skm.controllers;
 
+import nl.wtrlmn.skm.dto.UserInputDTO;
 import nl.wtrlmn.skm.models.User;
 import nl.wtrlmn.skm.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +27,13 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.save(user);
+    public User createUser(@RequestBody UserInputDTO userInputDTO) {
+        return userService.createUserFromDTO(userInputDTO);
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        user.setId(id);
-        return userService.save(user);
+    public User updateUser(@PathVariable Long id, @RequestBody UserInputDTO userInputDTO) {
+        return userService.updateUserFromDTO(id, userInputDTO);
     }
 
     @DeleteMapping("/{id}")

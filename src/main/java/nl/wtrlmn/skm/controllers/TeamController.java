@@ -1,5 +1,6 @@
 package nl.wtrlmn.skm.controllers;
 
+import nl.wtrlmn.skm.dto.TeamInputDTO;
 import nl.wtrlmn.skm.models.Team;
 import nl.wtrlmn.skm.services.TeamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +27,13 @@ public class TeamController {
     }
 
     @PostMapping
-    public Team createTeam(@RequestBody Team team) {
-        return teamService.save(team);
+    public Team createTeam(@RequestBody TeamInputDTO teamInputDTO) {
+        return teamService.createTeamFromDTO(teamInputDTO);
     }
 
     @PutMapping("/{id}")
-    public Team updateTeam(@PathVariable Long id, @RequestBody Team team) {
-        team.setId(id);
-        return teamService.save(team);
+    public Team updateTeam(@PathVariable Long id, @RequestBody TeamInputDTO teamInputDTO) {
+        return teamService.updateTeamFromDTO(id, teamInputDTO);
     }
 
     @DeleteMapping("/{id}")

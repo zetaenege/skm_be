@@ -1,6 +1,7 @@
 package nl.wtrlmn.skm.services;
 
 import jakarta.transaction.Transactional;
+import nl.wtrlmn.skm.dto.TournamentInputDTO;
 import nl.wtrlmn.skm.models.Match;
 import nl.wtrlmn.skm.models.Team;
 import nl.wtrlmn.skm.models.Tournament;
@@ -8,7 +9,6 @@ import nl.wtrlmn.skm.repository.TournamentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,9 +27,7 @@ public class TournamentService {
         return tournamentRepository.findById(id);
     }
 
-    public Tournament save(Tournament tournament) {
-        return tournamentRepository.save(tournament);
-    }
+
 
     public void deleteById(Long id) {
         tournamentRepository.deleteById(id);
@@ -72,4 +70,52 @@ public class TournamentService {
         tournament.getMatches().addAll(newMatches);
         tournamentRepository.save(tournament);
     }
+
+
+    // crear from dto
+    public Tournament createTournamentFromDTO(TournamentInputDTO dto) {
+
+        if (dto.getName() == null || dto.getName().isBlank()) {
+            throw new IllegalArgumentException("El nombre del torneo no puede estar vacío.");
+        }
+
+        Tournament tournament = new Tournament();
+        tournament.setName(dto.getName());
+        tournament.setImgProfile(dto.getImgProfile());
+        tournament.setStartDate(dto.getStartDate());
+        tournament.setEndDate(dto.getEndDate());
+        return tournamentRepository.save(tournament);
+
+    }
+
+
+    // actualizar from dto
+    public Tournament updateTournamentFromDTO(Long id, TournamentInputDTO dto) {
+        Tournament tournament = tournamentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Tournament not found with id: " + id));
+
+        if (dto.getName() != null) {
+            if (dto.getName().isBlank()) {
+                throw new IllegalArgumentException("El nombre del torneo no puede estar vacío si se proporciona.");
+            }
+            tournament.setName(dto.getName());
+        }
+
+        if (dto.getImgProfile() != null) {
+            tournament.setImgProfile(dto.getImgProfile());
+        }
+
+        if (dto.getStartDate() != null) {
+            tournament.setStartDate(dto.getStartDate());
+        }
+
+        if (dto.getEndDate() != null) {
+            tournament.setEndDate(dto.getEndDate());
+        }
+
+        return tournamentRepository.save(tournament);
+    }
+
+
+
 }
