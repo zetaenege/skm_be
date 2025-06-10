@@ -57,10 +57,7 @@ public class Tournament {
     }
 
     public void setName(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre del torneo no puede estar vacío.");
-        }
-        this.name = name.trim();
+        this.name = name;
     }
 
     public String getImgProfile() {

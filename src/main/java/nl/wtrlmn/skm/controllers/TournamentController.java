@@ -1,5 +1,6 @@
 package nl.wtrlmn.skm.controllers;
 
+import nl.wtrlmn.skm.dto.TournamentInputDTO;
 import nl.wtrlmn.skm.models.Tournament;
 import nl.wtrlmn.skm.services.TournamentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +27,13 @@ public class TournamentController {
     }
 
     @PostMapping(consumes = "application/json")
-    public Tournament createTournament(@RequestBody Tournament tournament) {
-        return tournamentService.save(tournament);
+    public Tournament createTournament(@RequestBody TournamentInputDTO tournamentInputDTO) {
+        return tournamentService.createTournamentFromDTO(tournamentInputDTO);
     }
 
     @PutMapping("/{id}")
-    public Tournament updateTournament(@PathVariable Long id, @RequestBody Tournament tournament) {
-        tournament.setId(id);
-        return tournamentService.save(tournament);
+    public Tournament updateTournament(@PathVariable Long id, @RequestBody TournamentInputDTO tournamentInputDTO) {
+        return tournamentService.updateTournamentFromDTO(id, tournamentInputDTO);
     }
 
     @DeleteMapping("/{id}")
