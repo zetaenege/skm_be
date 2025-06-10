@@ -1,4 +1,7 @@
 package nl.wtrlmn.skm.models;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +27,12 @@ public class Team {
 
     @ManyToOne
     @JoinColumn(name = "tournament_id", nullable = false)
+    @JsonBackReference("tournament-teams")
     private Tournament tournament;
 
     // La lista de jugadores del equipo (squad)
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<User> squad = new ArrayList<>();
 
     @Column(name = "points")
@@ -47,10 +52,12 @@ public class Team {
 
     // Relación con partidos jugados como local
     @OneToMany(mappedBy = "teamHome", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"teamHome", "teamAway", "tournament"})
     private List<Match> matchesHome = new ArrayList<>();
 
     // Relación con partidos jugados como visitante
     @OneToMany(mappedBy = "teamAway", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"teamHome", "teamAway", "tournament"})
     private List<Match> matchesAway = new ArrayList<>();
 
     // Métodos para actualizar estadísticas
@@ -131,7 +138,7 @@ public class Team {
         return matchesLost;
     }
 
-    public List<Match> getMatchesLocal() {
+    public List<Match> getMatchesHome() {
         return matchesHome;
     }
 

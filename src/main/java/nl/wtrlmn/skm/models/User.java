@@ -1,5 +1,6 @@
 package nl.wtrlmn.skm.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -38,13 +39,14 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "team_id")
+    @JsonBackReference
     private Team team;
 
     @ManyToOne
     @JoinColumn(name = "tournament_id")
     private Tournament tournament;
 
-    @JsonIgnore // Para no exponer la contraseña en JSON
+
     @NotBlank(message = "La contraseña no puede estar vacía.")
     @Column(nullable = false, name = "password")
     private String password;

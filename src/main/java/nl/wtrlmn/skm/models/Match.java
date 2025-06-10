@@ -1,5 +1,7 @@
 package nl.wtrlmn.skm.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -17,14 +19,17 @@ public class Match {
 
     @ManyToOne
     @JoinColumn(name = "tournament_id", nullable = false)
+    @JsonIgnoreProperties({"teams", "matches"})
     private Tournament tournament;
 
     @ManyToOne
     @JoinColumn(name = "team_home_id", nullable = false)
+    @JsonIgnoreProperties({"matchesHome", "matchesAway", "tournament", "squad"})
     private Team teamHome;
 
     @ManyToOne
     @JoinColumn(name = "team_away_id", nullable = false)
+    @JsonIgnoreProperties({"matchesHome", "matchesAway", "tournament", "squad"})
     private Team teamAway;
 
 
@@ -43,6 +48,20 @@ public class Match {
 
 
 
+    // Asignacion de puntos a los equipos
+    private void assignPoints(Team winner, Team loser, int winnerPoints, int loserPoints,
+                              boolean won, boolean drawn, boolean lost) {
+        if (teamHome == winner) {
+            this.teamHomePoints = winnerPoints;
+            this.teamAwayPoints = loserPoints;
+        } else {
+            this.teamHomePoints = loserPoints;
+            this.teamAwayPoints = winnerPoints;
+        }
+
+        winner.updateStatistics(winnerPoints, won, drawn, lost);
+        loser.updateStatistics(loserPoints, false, drawn, true);
+    }
 
 
     public void calculatePoints() {
@@ -67,14 +86,8 @@ public class Match {
         }
     }
 
-    private void assignPoints(Team winner, Team loser, int winnerPoints, int loserPoints,
-                              boolean won, boolean drawn, boolean lost) {
-        this.teamHomePoints = (winner == teamHome) ? winnerPoints : loserPoints;
-        this.teamAwayPoints = (winner == teamAway) ? winnerPoints : loserPoints;
 
-        winner.updateStatistics(winnerPoints, won, drawn, lost);
-        loser.updateStatistics(loserPoints, false, drawn, true);
-    }
+
 
     // Getters and setters
 

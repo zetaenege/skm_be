@@ -25,7 +25,7 @@ public class TournamentController {
         return tournamentService.findById(id);
     }
 
-    @PostMapping
+    @PostMapping(consumes = "application/json")
     public Tournament createTournament(@RequestBody Tournament tournament) {
         return tournamentService.save(tournament);
     }
@@ -39,5 +39,11 @@ public class TournamentController {
     @DeleteMapping("/{id}")
     public void deleteTournament(@PathVariable Long id) {
         tournamentService.deleteById(id);
+    }
+
+    @PostMapping("/{tournamentId}/generate-matches")
+    public String generateMatches(@PathVariable Long tournamentId) {
+        tournamentService.generateMatchesForTournament(tournamentId);
+        return "Matches generated for tournament with id: " + tournamentId;
     }
 }
