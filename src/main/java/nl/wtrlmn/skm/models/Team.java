@@ -27,12 +27,10 @@ public class Team {
 
     @ManyToOne
     @JoinColumn(name = "tournament_id", nullable = false)
-    @JsonBackReference("tournament-teams")
     private Tournament tournament;
 
     // La lista de jugadores del equipo (squad)
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
     private List<User> squad = new ArrayList<>();
 
     @Column(name = "points")
@@ -52,12 +50,10 @@ public class Team {
 
     // Relación con partidos jugados como local
     @OneToMany(mappedBy = "teamHome", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"teamHome", "teamAway", "tournament"})
     private List<Match> matchesHome = new ArrayList<>();
 
     // Relación con partidos jugados como visitante
     @OneToMany(mappedBy = "teamAway", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"teamHome", "teamAway", "tournament"})
     private List<Match> matchesAway = new ArrayList<>();
 
     // Métodos para actualizar estadísticas

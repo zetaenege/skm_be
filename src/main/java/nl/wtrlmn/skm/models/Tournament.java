@@ -31,11 +31,9 @@ public class Tournament {
 
     // Relaciones con otras entidades
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"matchesHome", "matchesAway", "tournament", "squad"})
     private List<Team> teams = new ArrayList<>();
 
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnoreProperties({"teamHome", "teamAway", "tournament"})
     private List<Match> matches = new ArrayList<>();
 
     //encontrar jugadores en del torneo [si no sirve quitarlo]

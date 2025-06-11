@@ -9,6 +9,7 @@ import nl.wtrlmn.skm.repository.TeamRepository;
 import nl.wtrlmn.skm.repository.TournamentRepository;
 import nl.wtrlmn.skm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +26,9 @@ public class UserService {
 
     @Autowired
     private TournamentRepository tournamentRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
 
@@ -55,14 +59,25 @@ public class UserService {
     }
 
 
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
+    }
+
     private void fillUserFromDTO(User user, UserInputDTO dto) {
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setPosition(dto.getPosition());
         user.setCoach(dto.isCoach());
         user.setAdmin(dto.isAdmin());
-        user.setPassword(dto.getPassword());
         user.setImgProfile(dto.getImgProfile());
+
+
+        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+            String encryptedPassword = passwordEncoder.encode(dto.getPassword());
+            user.setPassword(encryptedPassword);
+        }
+
 
         if (dto.getTeamId() != null) {
             Team team = teamRepository.findById(dto.getTeamId())

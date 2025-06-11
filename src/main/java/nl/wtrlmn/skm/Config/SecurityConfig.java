@@ -1,5 +1,5 @@
 package nl.wtrlmn.skm.Config;
-
+import org.springframework.http.HttpMethod;
 import nl.wtrlmn.skm.services.AuthenticationUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +29,30 @@ public class SecurityConfig {
         http
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public").permitAll()
+                        .requestMatchers("/public/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        .requestMatchers("/api/users/me").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/users/me").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
                         .requestMatchers("/secure").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/teams").permitAll()
+
+                        //tournament Auth
+                        .requestMatchers(HttpMethod.GET, "/api/tournaments/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/tournaments/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/tournaments/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/tournaments/**").hasRole("ADMIN")
+                        //team Auth
+                        .requestMatchers(HttpMethod.GET, "/api/teams/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/teams/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/teams/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/teams/**").hasRole("ADMIN")
+                        //match Auth
+                        .requestMatchers(HttpMethod.GET, "/api/matches/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/matches/**").hasRole( "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/matches/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/matches/**").hasRole("ADMIN")
+
                         .anyRequest().denyAll()
                 )
                 .csrf(csrf -> csrf.disable())

@@ -1,6 +1,8 @@
 package nl.wtrlmn.skm.services;
 
 import nl.wtrlmn.skm.dto.TeamInputDTO;
+import nl.wtrlmn.skm.dto.TeamOutputDTO;
+import nl.wtrlmn.skm.dto.TournamentSimpleDTO;
 import nl.wtrlmn.skm.models.Team;
 import nl.wtrlmn.skm.models.Tournament;
 import nl.wtrlmn.skm.repository.TeamRepository;
@@ -21,8 +23,13 @@ public class TeamService {
     private TournamentRepository tournamentRepository;
 
 
-    public List<Team> findAll() {
-        return teamRepository.findAll();
+
+
+    public List<TeamOutputDTO> findAllAsDTOs() {
+        List<Team> teams = teamRepository.findAll();
+        return teams.stream()
+                .map(this::convertToTeamOutputDTO)
+                .toList();
     }
 
     public Optional<Team> findById(Long id) {
@@ -32,6 +39,26 @@ public class TeamService {
 
     public void deleteById(Long id) {
         teamRepository.deleteById(id);
+    }
+
+    public TeamOutputDTO convertToTeamOutputDTO(Team team) {
+        TeamOutputDTO dto = new TeamOutputDTO();
+        dto.setId(team.getId());
+        dto.setName(team.getName());
+        dto.setImgProfile(team.getImgProfile());
+        dto.setCity(team.getCity());
+
+        Tournament tournament = team.getTournament();
+        TournamentSimpleDTO tournamentDTO = new TournamentSimpleDTO();
+        tournamentDTO.setId(tournament.getId());
+        tournamentDTO.setName(tournament.getName());
+        tournamentDTO.setImgProfile(tournament.getImgProfile());
+        tournamentDTO.setStartDate(tournament.getStartDate());
+        tournamentDTO.setEndDate(tournament.getEndDate());
+
+        dto.setTournament(tournamentDTO);
+
+        return dto;
     }
 
 

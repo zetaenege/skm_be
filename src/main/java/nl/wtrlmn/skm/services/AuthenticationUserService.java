@@ -1,32 +1,32 @@
 package nl.wtrlmn.skm.services;
 
-import org.springframework.security.core.userdetails.User;
+import nl.wtrlmn.skm.models.User;
+import nl.wtrlmn.skm.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthenticationUserService implements UserDetailsService {
 
-    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository; // 👈 Añade esta línea
 
-    public AuthenticationUserService(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
+    public AuthenticationUserService(UserRepository userRepository) { // 👈 Añade el repositorio como parámetro
+        this.userRepository = userRepository;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User userEntity = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
 
-        if (!username.equals("user")) {
-            throw new UsernameNotFoundException("User not found");
-        }
+        String role = userEntity.isAdmin() ? "ADMIN" : "USER";
 
-        return User.builder()
-                .username("user")
-                .password(passwordEncoder.encode("password"))
-                .roles("USER")
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(userEntity.getEmail())
+                .password(userEntity.getPassword())
+                .roles(role)
                 .build();
     }
 }
