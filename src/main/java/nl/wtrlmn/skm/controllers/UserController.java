@@ -1,6 +1,7 @@
 package nl.wtrlmn.skm.controllers;
 
 import nl.wtrlmn.skm.dto.UserInputDTO;
+import nl.wtrlmn.skm.dto.UserOutputDTO;
 import nl.wtrlmn.skm.models.User;
 import nl.wtrlmn.skm.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +28,11 @@ public class UserController {
         return userService.findById(id);
     }
 
-    @GetMapping("/me")
-    public User getAuthenticatedUserInfo(Principal principal) {
-        String email = principal.getName(); // Spring devuelve el "username" del usuario logueado
-        return userService.findByEmail(email);
+    @PutMapping("/me")
+    public UserOutputDTO updateMyUser(@RequestBody UserInputDTO userInputDTO, Principal principal) {
+        String email = principal.getName();
+        User updatedUser = userService.updateUserFromDTO(email, userInputDTO);
+        return userService.convertToUserOutputDTO(updatedUser);
     }
 
 
@@ -43,6 +45,8 @@ public class UserController {
     public User updateUser(@PathVariable Long id, @RequestBody UserInputDTO userInputDTO) {
         return userService.updateUserFromDTO(id, userInputDTO);
     }
+
+
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
