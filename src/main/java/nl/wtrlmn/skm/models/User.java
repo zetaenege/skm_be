@@ -39,7 +39,6 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "team_id")
-    @JsonBackReference
     private Team team;
 
     @ManyToOne

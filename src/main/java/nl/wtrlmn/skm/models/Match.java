@@ -19,17 +19,14 @@ public class Match {
 
     @ManyToOne
     @JoinColumn(name = "tournament_id", nullable = false)
-    @JsonIgnoreProperties({"teams", "matches"})
     private Tournament tournament;
 
     @ManyToOne
     @JoinColumn(name = "team_home_id", nullable = false)
-    @JsonIgnoreProperties({"matchesHome", "matchesAway", "tournament", "squad"})
     private Team teamHome;
 
     @ManyToOne
     @JoinColumn(name = "team_away_id", nullable = false)
-    @JsonIgnoreProperties({"matchesHome", "matchesAway", "tournament", "squad"})
     private Team teamAway;
 
 
