@@ -19,30 +19,30 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public List<User> getAllUsers() {
+    public List<UserOutputDTO> getAllUsers() {
         return userService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Optional<User> getUserById(@PathVariable Long id) {
-        return userService.findById(id);
+    public UserOutputDTO getUserById(@PathVariable Long id) {
+
+        return userService.findByIdDTO(id);
     }
 
     @PutMapping("/me")
     public UserOutputDTO updateMyUser(@RequestBody UserInputDTO userInputDTO, Principal principal) {
-        String email = principal.getName();
-        User updatedUser = userService.updateUserFromDTO(email, userInputDTO);
-        return userService.convertToUserOutputDTO(updatedUser);
+        UserOutputDTO user = userService.findByEmailDTO(principal.getName());
+        return userService.updateUserFromDTO(user.getId(), userInputDTO);
     }
 
 
     @PostMapping
-    public User createUser(@RequestBody UserInputDTO userInputDTO) {
+    public UserOutputDTO createUser(@RequestBody UserInputDTO userInputDTO) {
         return userService.createUserFromDTO(userInputDTO);
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody UserInputDTO userInputDTO) {
+    public UserOutputDTO updateUser(@PathVariable Long id, @RequestBody UserInputDTO userInputDTO) {
         return userService.updateUserFromDTO(id, userInputDTO);
     }
 

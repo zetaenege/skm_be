@@ -4,17 +4,15 @@ package nl.wtrlmn.skm.services;
 import nl.wtrlmn.skm.dto.UserInputDTO;
 import nl.wtrlmn.skm.dto.UserOutputDTO;
 import nl.wtrlmn.skm.models.Team;
-import nl.wtrlmn.skm.models.Tournament;
 import nl.wtrlmn.skm.models.User;
 import nl.wtrlmn.skm.repository.TeamRepository;
-import nl.wtrlmn.skm.repository.TournamentRepository;
 import nl.wtrlmn.skm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.Optional;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class UserService {
@@ -26,78 +24,60 @@ public class UserService {
     private TeamRepository teamRepository;
 
     @Autowired
-    private TournamentRepository tournamentRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
 
+    public List<UserOutputDTO> findAll() {
 
-    public List<User> findAll() {
-        return userRepository.findAll();
+        return userRepository.findAll().stream()
+                .map(this::convertToUserOutputDTO)
+                .toList();
     }
 
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
+
+    public UserOutputDTO findByIdDTO(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        return convertToUserOutputDTO(user);
     }
 
 
-    public void deleteById(Long id) {
-        userRepository.deleteById(id);
-    }
 
-    public User createUserFromDTO(UserInputDTO dto) {
+    public UserOutputDTO createUserFromDTO(UserInputDTO dto) {
         User user = new User();
+        if(userRepository.findByEmail(dto.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Email already in use: " + dto.getEmail());
+        }
         fillUserFromDTO(user, dto);
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return convertToUserOutputDTO(savedUser);
     }
 
-    public User updateUserFromDTO(Long id, UserInputDTO dto) {
+
+    public UserOutputDTO updateUserFromDTO(Long id, UserInputDTO dto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
         fillUserFromDTO(user, dto);
-        return userRepository.save(user);
+        User updatedUser = userRepository.save(user);
+        return convertToUserOutputDTO(updatedUser);
     }
 
-    public User updateUserFromDTO(String email, UserInputDTO dto) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
+    public void deleteById(Long id) {
 
-        // Actualiza sólo los campos deseados
-        user.setName(dto.getName());
-        user.setImgProfile(dto.getImgProfile());
-        user.setPosition(dto.getPosition());
-        user.setCoach(dto.isCoach());
-        user.setAdmin(dto.isAdmin());
-
-        // Si se manda un nuevo password
-        if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
-            String encryptedPassword = passwordEncoder.encode(dto.getPassword());
-            user.setPassword(encryptedPassword);
-        }
-
-        // Asigna el equipo si viene en el DTO
-        if (dto.getTeamId() != null) {
-            Team team = teamRepository.findById(dto.getTeamId())
-                    .orElseThrow(() -> new IllegalArgumentException("Team not found with id: " + dto.getTeamId()));
-            user.setTeam(team);
-        }
-
-        // Asigna el torneo si viene en el DTO
-        if (dto.getTournamentId() != null) {
-            Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
-                    .orElseThrow(() -> new IllegalArgumentException("Tournament not found with id: " + dto.getTournamentId()));
-            user.setTournament(tournament);
-        }
-
-        return userRepository.save(user);
+        userRepository.deleteById(id);
     }
 
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
+    public UserService(
+            UserRepository userRepository,
+            TeamRepository teamRepository,
+            PasswordEncoder passwordEncoder
+    ) {
+        this.userRepository = userRepository;
+        this.teamRepository = teamRepository;
+        this.passwordEncoder = passwordEncoder;
     }
+
 
     private void fillUserFromDTO(User user, UserInputDTO dto) {
         user.setName(dto.getName());
@@ -109,8 +89,7 @@ public class UserService {
 
 
         if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
-            String encryptedPassword = passwordEncoder.encode(dto.getPassword());
-            user.setPassword(encryptedPassword);
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
 
 
@@ -118,17 +97,8 @@ public class UserService {
             Team team = teamRepository.findById(dto.getTeamId())
                     .orElseThrow(() -> new IllegalArgumentException("Team not found with id: " + dto.getTeamId()));
             user.setTeam(team);
-        } else {
-            user.setTeam(null);
         }
 
-        if (dto.getTournamentId() != null) {
-            Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
-                    .orElseThrow(() -> new IllegalArgumentException("Tournament not found with id: " + dto.getTournamentId()));
-            user.setTournament(tournament);
-        } else {
-            user.setTournament(null);
-        }
     }
     public UserOutputDTO convertToUserOutputDTO(User user) {
         UserOutputDTO dto = new UserOutputDTO();
@@ -143,11 +113,14 @@ public class UserService {
         if (user.getTeam() != null) {
             dto.setTeamId(user.getTeam().getId());
         }
-        if (user.getTournament() != null) {
-            dto.setTournamentId(user.getTournament().getId());
-        }
 
         return dto;
+    }
+
+    public UserOutputDTO findByEmailDTO(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
+        return convertToUserOutputDTO(user);
     }
 
 }

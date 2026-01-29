@@ -1,7 +1,10 @@
 package nl.wtrlmn.skm.services;
 
 import jakarta.transaction.Transactional;
+import nl.wtrlmn.skm.dto.TeamSimpleDTO;
 import nl.wtrlmn.skm.dto.TournamentInputDTO;
+import nl.wtrlmn.skm.dto.TournamentOutputDTO;
+import nl.wtrlmn.skm.dto.TournamentSimpleDTO;
 import nl.wtrlmn.skm.models.Match;
 import nl.wtrlmn.skm.models.Team;
 import nl.wtrlmn.skm.models.Tournament;
@@ -11,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TournamentService {
@@ -19,12 +22,19 @@ public class TournamentService {
     @Autowired
     private TournamentRepository tournamentRepository;
 
-    public List<Tournament> findAll() {
-        return tournamentRepository.findAll();
+    public List<TournamentSimpleDTO> findAll() {
+
+        return tournamentRepository.findAll().stream()
+                .map(this::convertToSimpleDTO)
+                .collect(Collectors.toList());
+
     }
 
-    public Optional<Tournament> findById(Long id) {
-        return tournamentRepository.findById(id);
+    public TournamentOutputDTO findById(Long id) {
+
+        Tournament tournament = tournamentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tournament not found"));
+        return convertToOutputDTO(tournament);
     }
 
 
@@ -32,6 +42,7 @@ public class TournamentService {
     public void deleteById(Long id) {
         tournamentRepository.deleteById(id);
     }
+
 
     //Match Generator
 
@@ -73,10 +84,10 @@ public class TournamentService {
 
 
     // crear from dto
-    public Tournament createTournamentFromDTO(TournamentInputDTO dto) {
+    public TournamentSimpleDTO createTournamentFromDTO(TournamentInputDTO dto) {
 
         if (dto.getName() == null || dto.getName().isBlank()) {
-            throw new IllegalArgumentException("El nombre del torneo no puede estar vacío.");
+            throw new IllegalArgumentException("The tournament name cannot be empty.");
         }
 
         Tournament tournament = new Tournament();
@@ -84,19 +95,23 @@ public class TournamentService {
         tournament.setImgProfile(dto.getImgProfile());
         tournament.setStartDate(dto.getStartDate());
         tournament.setEndDate(dto.getEndDate());
-        return tournamentRepository.save(tournament);
+        Tournament savedTournament = tournamentRepository.save(tournament);
+        return convertToSimpleDTO(savedTournament);
 
     }
 
 
+
+
+
     // actualizar from dto
-    public Tournament updateTournamentFromDTO(Long id, TournamentInputDTO dto) {
+    public TournamentOutputDTO updateTournamentFromDTO(Long id, TournamentInputDTO dto) {
         Tournament tournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Tournament not found with id: " + id));
 
         if (dto.getName() != null) {
             if (dto.getName().isBlank()) {
-                throw new IllegalArgumentException("El nombre del torneo no puede estar vacío si se proporciona.");
+                throw new IllegalArgumentException("The tournament name cannot be empty.");
             }
             tournament.setName(dto.getName());
         }
@@ -112,10 +127,43 @@ public class TournamentService {
         if (dto.getEndDate() != null) {
             tournament.setEndDate(dto.getEndDate());
         }
-
-        return tournamentRepository.save(tournament);
+        Tournament updatedTournament = tournamentRepository.save(tournament);
+        return convertToOutputDTO(updatedTournament);
     }
 
+
+
+    private TournamentSimpleDTO convertToSimpleDTO(Tournament t) {
+        TournamentSimpleDTO dto = new TournamentSimpleDTO();
+        dto.setId(t.getId());
+        dto.setName(t.getName());
+        dto.setImgProfile(t.getImgProfile());
+        dto.setStartDate(t.getStartDate());
+        dto.setEndDate(t.getEndDate());
+        return dto;
+    }
+
+    private TournamentOutputDTO convertToOutputDTO(Tournament t) {
+        TournamentOutputDTO dto = new TournamentOutputDTO();
+        dto.setId(t.getId());
+        dto.setName(t.getName());
+        dto.setImgProfile(t.getImgProfile());
+        dto.setStartDate(t.getStartDate());
+        dto.setEndDate(t.getEndDate());
+
+
+        if (t.getTeams() != null) {
+            dto.setTeams(t.getTeams().stream().map(team -> {
+                TeamSimpleDTO ts = new TeamSimpleDTO();
+                ts.setId(team.getId());
+                ts.setName(team.getName());
+                ts.setImgProfile(team.getImgProfile());
+                ts.setCity(team.getCity());
+                return ts;
+            }).collect(Collectors.toList()));
+        }
+        return dto;
+    }
 
 
 }

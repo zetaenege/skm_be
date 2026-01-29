@@ -27,17 +27,33 @@ public class TeamService {
 
     public List<TeamOutputDTO> findAllAsDTOs() {
         List<Team> teams = teamRepository.findAll();
-        return teams.stream()
+        return teamRepository.findAll().stream()
                 .map(this::convertToTeamOutputDTO)
                 .toList();
     }
 
-    public Optional<Team> findById(Long id) {
-        return teamRepository.findById(id);
+    public TeamOutputDTO findByIdDTO(Long id) {
+       Team team = teamRepository.findById(id)
+               .orElseThrow(() -> new RuntimeException("Team not found with id: " + id));
+         return convertToTeamOutputDTO(team);
+    }
+
+
+    public TeamOutputDTO createTeam(TeamInputDTO dto) {
+        Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
+                .orElseThrow(() -> new RuntimeException("Tournament not found "));
+        Team team = new Team();
+        team.setName(dto.getName());
+        team.setImgProfile(dto.getImgProfile());
+        team.setCity(dto.getCity());
+        team.setTournament(tournament);
+        Team savedTeam = teamRepository.save(team);
+        return convertToTeamOutputDTO(savedTeam);
     }
 
 
     public void deleteById(Long id) {
+
         teamRepository.deleteById(id);
     }
 
@@ -48,41 +64,29 @@ public class TeamService {
         dto.setImgProfile(team.getImgProfile());
         dto.setCity(team.getCity());
 
-        Tournament tournament = team.getTournament();
-        TournamentSimpleDTO tournamentDTO = new TournamentSimpleDTO();
-        tournamentDTO.setId(tournament.getId());
-        tournamentDTO.setName(tournament.getName());
-        tournamentDTO.setImgProfile(tournament.getImgProfile());
-        tournamentDTO.setStartDate(tournament.getStartDate());
-        tournamentDTO.setEndDate(tournament.getEndDate());
-
-        dto.setTournament(tournamentDTO);
 
         return dto;
     }
 
 
-    public Team createTeamFromDTO(TeamInputDTO dto) {
-        Tournament tournament = tournamentRepository.findById(dto.getTournamentId()).orElseThrow(() -> new IllegalArgumentException("Tournament not found with id: " + dto.getTournamentId()));
-        Team team = new Team();
-        team.setName(dto.getName());
-        team.setImgProfile(dto.getImgProfile());
-        team.setTournament(tournament);
-        team.setCity(dto.getCity());
-        return teamRepository.save(team);
-    }
 
-    public Team updateTeamFromDTO(Long id, TeamInputDTO dto) {
-        Team team = teamRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Team not found with id: " + id));
 
-        Tournament tournament = tournamentRepository.findById(dto.getTournamentId()).orElseThrow(() -> new IllegalArgumentException("Tournament not found with id: " + dto.getTournamentId()));
+    public TeamOutputDTO updateTeamFromDTO(Long id, TeamInputDTO dto) {
 
-        team.setName(dto.getName());
-        team.setImgProfile(dto.getImgProfile());
-        team.setCity(dto.getCity());
-        team.setTournament(tournament);
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Team not found with id: " + id));
 
-        return teamRepository.save(team);
+        if (dto.getName() != null) team.setName(dto.getName());
+        if (dto.getImgProfile() != null) team.setImgProfile(dto.getImgProfile());
+        if (dto.getCity() != null) team.setCity(dto.getCity());
+
+        if(dto.getTournamentId() != null) {
+            Tournament tournament = tournamentRepository.findById(dto.getTournamentId())
+                    .orElseThrow(() -> new RuntimeException("Tournament not found with id: " + dto.getTournamentId()));
+            team.setTournament(tournament);
+        }
+        Team savedTeam = teamRepository.save(team);
+        return convertToTeamOutputDTO(savedTeam);
     }
 
 

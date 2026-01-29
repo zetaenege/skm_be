@@ -1,6 +1,8 @@
 package nl.wtrlmn.skm.controllers;
 
 import nl.wtrlmn.skm.dto.TournamentInputDTO;
+import nl.wtrlmn.skm.dto.TournamentOutputDTO;
+import nl.wtrlmn.skm.dto.TournamentSimpleDTO;
 import nl.wtrlmn.skm.models.Tournament;
 import nl.wtrlmn.skm.services.TournamentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,22 +19,23 @@ public class TournamentController {
     private TournamentService tournamentService;
 
     @GetMapping
-    public List<Tournament> getAllTournaments() {
+    public List<TournamentSimpleDTO> getAllTournaments() {
         return tournamentService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Optional<Tournament> getTournamentById(@PathVariable Long id) {
+    public TournamentOutputDTO getTournamentById(@PathVariable Long id) {
+
         return tournamentService.findById(id);
     }
 
     @PostMapping(consumes = "application/json")
-    public Tournament createTournament(@RequestBody TournamentInputDTO tournamentInputDTO) {
+    public TournamentSimpleDTO createTournament(@RequestBody TournamentInputDTO tournamentInputDTO) {
         return tournamentService.createTournamentFromDTO(tournamentInputDTO);
     }
 
     @PutMapping("/{id}")
-    public Tournament updateTournament(@PathVariable Long id, @RequestBody TournamentInputDTO tournamentInputDTO) {
+    public TournamentOutputDTO updateTournament(@PathVariable Long id, @RequestBody TournamentInputDTO tournamentInputDTO) {
         return tournamentService.updateTournamentFromDTO(id, tournamentInputDTO);
     }
 

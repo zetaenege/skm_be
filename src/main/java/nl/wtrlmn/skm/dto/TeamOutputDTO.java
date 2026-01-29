@@ -5,8 +5,6 @@ public class TeamOutputDTO {
     private String name;
     private String imgProfile;
     private String city;
-    private TournamentSimpleDTO tournament;
-
     public Long getId() {
         return id;
     }
@@ -39,11 +37,4 @@ public class TeamOutputDTO {
         this.city = city;
     }
 
-    public TournamentSimpleDTO getTournament() {
-        return tournament;
-    }
-
-    public void setTournament(TournamentSimpleDTO tournament) {
-        this.tournament = tournament;
-    }
 }

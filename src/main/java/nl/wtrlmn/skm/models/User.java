@@ -32,18 +32,14 @@ public class User {
     private String position;
 
     @Column(name = "is_coach")
-    private boolean isCoach;
+    private boolean isCoach = false;
 
     @Column(name = "is_admin")
-    private boolean isAdmin;
+    private boolean isAdmin = false;
 
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;
-
-    @ManyToOne
-    @JoinColumn(name = "tournament_id")
-    private Tournament tournament;
 
 
     @NotBlank(message = "La contraseña no puede estar vacía.")
@@ -60,7 +56,6 @@ public class User {
         this.isCoach = isCoach;
         this.isAdmin = isAdmin;
         this.team = team;
-        this.tournament = tournament;
         this.password = password;
         this.imgProfile = imgProfile;
     }
@@ -121,14 +116,6 @@ public class User {
 
     public void setTeam(Team team) {
         this.team = team;
-    }
-
-    public Tournament getTournament() {
-        return tournament;
-    }
-
-    public void setTournament(Tournament tournament) {
-        this.tournament = tournament;
     }
 
     public String getPassword() {

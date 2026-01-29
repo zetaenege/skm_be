@@ -5,6 +5,8 @@ public class TeamSimpleDTO {
     private Long id;
     private String name;
     private String imgProfile;
+    private String city;
+
 
     public String getCity() {
         return city;
@@ -38,6 +40,6 @@ public class TeamSimpleDTO {
         this.id = id;
     }
 
-    private String city;
+
 
 }

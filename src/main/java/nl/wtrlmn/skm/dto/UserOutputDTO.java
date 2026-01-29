@@ -10,7 +10,6 @@ public class UserOutputDTO {
     private boolean isCoach;
     private boolean isAdmin;
     private Long teamId;
-    private Long tournamentId;
 
     // Getters & Setters
 
@@ -78,11 +77,4 @@ public class UserOutputDTO {
         this.teamId = teamId;
     }
 
-    public Long getTournamentId() {
-        return tournamentId;
-    }
-
-    public void setTournamentId(Long tournamentId) {
-        this.tournamentId = tournamentId;
-    }
 }

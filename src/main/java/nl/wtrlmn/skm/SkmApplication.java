@@ -30,7 +30,6 @@ public class SkmApplication {
                 admin.setImgProfile(null);
                 admin.setPosition("Manager");
                 admin.setTeam(null);
-                admin.setTournament(null);
                 userRepository.save(admin);
                 System.out.println("✅ Admin creado: " + email + " / admin123");
             } else {

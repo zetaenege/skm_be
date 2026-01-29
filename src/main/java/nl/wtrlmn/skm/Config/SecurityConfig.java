@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/matches/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/matches/**").hasRole("ADMIN")
 
-                        .anyRequest().denyAll()
+                        .anyRequest().permitAll()
                 )
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> {
