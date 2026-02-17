@@ -25,7 +25,7 @@ public class Team {
     @Column(nullable = false, name = "city")
     private String city;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tournament_id", nullable = false)
     private Tournament tournament;
 

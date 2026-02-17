@@ -112,6 +112,11 @@ public class UserService {
 
         if (user.getTeam() != null) {
             dto.setTeamId(user.getTeam().getId());
+
+            if (user.getTeam().getTournament() != null) {
+                dto.setTournamentId(user.getTeam().getTournament().getId());
+            }
+
         }
 
         return dto;

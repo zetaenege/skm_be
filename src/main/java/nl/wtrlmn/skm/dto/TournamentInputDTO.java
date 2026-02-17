@@ -8,10 +8,19 @@ public class TournamentInputDTO {
     private String imgProfile;
     private LocalDate startDate;
     private LocalDate endDate;
+    private String city;
 
 
     // G & S
 
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
 
     public String getName() {
         return name;

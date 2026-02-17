@@ -22,13 +22,13 @@ public class SkmApplication {
             String email = "admin@example.com";
             if (userRepository.findByEmail(email).isEmpty()) {
                 User admin = new User();
-                admin.setName("Admin");
+                admin.setName("Levo D'agosto");
                 admin.setEmail(email);
                 admin.setPassword(passwordEncoder.encode("admin123"));
                 admin.setAdmin(true);
                 admin.setCoach(false);
                 admin.setImgProfile(null);
-                admin.setPosition("Manager");
+                admin.setPosition("Administrator");
                 admin.setTeam(null);
                 userRepository.save(admin);
                 System.out.println("✅ Admin creado: " + email + " / admin123");

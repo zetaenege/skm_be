@@ -5,6 +5,8 @@ import nl.wtrlmn.skm.dto.UserOutputDTO;
 import nl.wtrlmn.skm.models.User;
 import nl.wtrlmn.skm.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -27,6 +29,15 @@ public class UserController {
     public UserOutputDTO getUserById(@PathVariable Long id) {
 
         return userService.findByIdDTO(id);
+    }
+    @GetMapping("/me")
+    public ResponseEntity<UserOutputDTO> getMyUser(Principal principal) {
+        if (principal == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserOutputDTO user = userService.findByEmailDTO(principal.getName());
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/me")

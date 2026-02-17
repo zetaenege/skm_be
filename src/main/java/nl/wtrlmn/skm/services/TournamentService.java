@@ -1,10 +1,6 @@
 package nl.wtrlmn.skm.services;
-
 import jakarta.transaction.Transactional;
-import nl.wtrlmn.skm.dto.TeamSimpleDTO;
-import nl.wtrlmn.skm.dto.TournamentInputDTO;
-import nl.wtrlmn.skm.dto.TournamentOutputDTO;
-import nl.wtrlmn.skm.dto.TournamentSimpleDTO;
+import nl.wtrlmn.skm.dto.*;
 import nl.wtrlmn.skm.models.Match;
 import nl.wtrlmn.skm.models.Team;
 import nl.wtrlmn.skm.models.Tournament;
@@ -22,36 +18,37 @@ public class TournamentService {
     @Autowired
     private TournamentRepository tournamentRepository;
 
-    public List<TournamentSimpleDTO> findAll() {
+    @Autowired
+    private TeamService teamService;
 
+    public List<TournamentSimpleDTO> findAll() {
         return tournamentRepository.findAll().stream()
                 .map(this::convertToSimpleDTO)
                 .collect(Collectors.toList());
-
     }
 
     public TournamentOutputDTO findById(Long id) {
-
         Tournament tournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tournament not found"));
         return convertToOutputDTO(tournament);
     }
-
-
 
     public void deleteById(Long id) {
         tournamentRepository.deleteById(id);
     }
 
 
-    //Match Generator
-
+    // Match Generator
     @Transactional
     public void generateMatchesForTournament(Long tournamentId) {
         Tournament tournament = tournamentRepository.findById(tournamentId)
                 .orElseThrow(() -> new IllegalArgumentException("Tournament not found with id: " + tournamentId));
 
         List<Team> teams = tournament.getTeams();
+        if (teams.size() < 2) {
+            throw new IllegalArgumentException("Not enough teams to generate matches (Need at least 2).");
+        }
+
         List<Match> newMatches = new ArrayList<>();
 
         for (int i = 0; i < teams.size(); i++) {
@@ -60,12 +57,19 @@ public class TournamentService {
                 Team teamB = teams.get(j);
 
                 // Partido de ida
+
                 Match matchHome = new Match();
                 matchHome.setTeamHome(teamA);
                 matchHome.setTeamAway(teamB);
                 matchHome.setTournament(tournament);
                 matchHome.setMatchDate(tournament.getStartDate().atStartOfDay().plusDays(newMatches.size()));
+
+                matchHome.setTeamHomeScore(0);
+                matchHome.setTeamAwayScore(0);
+                matchHome.setStatus("SCHEDULED");
+
                 newMatches.add(matchHome);
+
 
                 // Partido de vuelta
                 Match matchAway = new Match();
@@ -73,15 +77,25 @@ public class TournamentService {
                 matchAway.setTeamAway(teamA);
                 matchAway.setTournament(tournament);
                 matchAway.setMatchDate(tournament.getStartDate().atStartOfDay().plusDays(newMatches.size()));
+
+                matchAway.setTeamHomeScore(0);
+                matchAway.setTeamAwayScore(0);
+                matchAway.setStatus("SCHEDULED");
+
                 newMatches.add(matchAway);
             }
         }
 
-        tournament.getMatches().clear();
-        tournament.getMatches().addAll(newMatches);
+        // Asignar correctamente la lista antes de guardar
+        if (tournament.getMatches() != null) {
+            tournament.getMatches().clear();
+            tournament.getMatches().addAll(newMatches);
+        } else {
+            tournament.setMatches(newMatches);
+        }
+
         tournamentRepository.save(tournament);
     }
-
 
     // crear from dto
     public TournamentSimpleDTO createTournamentFromDTO(TournamentInputDTO dto) {
@@ -95,14 +109,10 @@ public class TournamentService {
         tournament.setImgProfile(dto.getImgProfile());
         tournament.setStartDate(dto.getStartDate());
         tournament.setEndDate(dto.getEndDate());
+        tournament.setCity(dto.getCity());
         Tournament savedTournament = tournamentRepository.save(tournament);
         return convertToSimpleDTO(savedTournament);
-
     }
-
-
-
-
 
     // actualizar from dto
     public TournamentOutputDTO updateTournamentFromDTO(Long id, TournamentInputDTO dto) {
@@ -127,11 +137,12 @@ public class TournamentService {
         if (dto.getEndDate() != null) {
             tournament.setEndDate(dto.getEndDate());
         }
+        if (dto.getCity() != null) {
+            tournament.setCity(dto.getCity());
+        }
         Tournament updatedTournament = tournamentRepository.save(tournament);
         return convertToOutputDTO(updatedTournament);
     }
-
-
 
     private TournamentSimpleDTO convertToSimpleDTO(Tournament t) {
         TournamentSimpleDTO dto = new TournamentSimpleDTO();
@@ -140,30 +151,36 @@ public class TournamentService {
         dto.setImgProfile(t.getImgProfile());
         dto.setStartDate(t.getStartDate());
         dto.setEndDate(t.getEndDate());
+        dto.setCity(t.getCity());
         return dto;
     }
 
-    private TournamentOutputDTO convertToOutputDTO(Tournament t) {
+    private TournamentOutputDTO convertToOutputDTO(Tournament tournament) {
         TournamentOutputDTO dto = new TournamentOutputDTO();
-        dto.setId(t.getId());
-        dto.setName(t.getName());
-        dto.setImgProfile(t.getImgProfile());
-        dto.setStartDate(t.getStartDate());
-        dto.setEndDate(t.getEndDate());
+        dto.setId(tournament.getId());
+        dto.setName(tournament.getName());
+        dto.setImgProfile(tournament.getImgProfile());
+        dto.setStartDate(tournament.getStartDate());
+        dto.setEndDate(tournament.getEndDate());
+        dto.setActive(tournament.isActive());
+        dto.setCity(tournament.getCity());
 
-
-        if (t.getTeams() != null) {
-            dto.setTeams(t.getTeams().stream().map(team -> {
-                TeamSimpleDTO ts = new TeamSimpleDTO();
-                ts.setId(team.getId());
-                ts.setName(team.getName());
-                ts.setImgProfile(team.getImgProfile());
-                ts.setCity(team.getCity());
-                return ts;
-            }).collect(Collectors.toList()));
+        // CAMBIO: Usamos teamService para que calcule los puntos
+        if (tournament.getTeams() != null) {
+            List<TeamOutputDTO> teamDTOs = tournament.getTeams().stream()
+                    .map(team -> teamService.convertToTeamOutputDTO(team)) // <--- MAGIA AQUÍ
+                    .collect(Collectors.toList());
+            dto.setTeams(teamDTOs);
         }
         return dto;
     }
 
+
+    public List<TournamentOutputDTO> findAllDTOs() {
+        List<Tournament> tournaments = tournamentRepository.findAll();
+        return tournaments.stream()
+                .map(this::convertToOutputDTO)
+                .toList();
+    }
 
 }

@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface MatchRepository extends JpaRepository<Match, Long> {
     List<Match> findByTeamHomeIdOrTeamAwayId(Long homeId, Long awayId);
+    List<Match> findByTournamentId(Long tournamentId);
 }

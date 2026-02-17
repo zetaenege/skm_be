@@ -33,9 +33,14 @@ public class MatchController {
     }
 
     @PutMapping("/{id}")
-    public MatchOutputDTO updateMatch(@PathVariable Long id, @RequestBody Match match) {
-        match.setId(id);
-        return matchService.saveFromDTO(match);
+    public MatchOutputDTO updateMatch(@PathVariable Long id, @RequestBody Match matchData) {
+
+        return matchService.updateMatchResult(
+                id,
+                matchData.getTeamHomeScore(),
+                matchData.getTeamAwayScore(),
+                matchData.getStatus()
+        );
     }
 
     @DeleteMapping("/{id}")
@@ -47,5 +52,10 @@ public class MatchController {
     @GetMapping("/team/{teamId}")
     public  List<MatchOutputDTO> getMatchesByTeam(@PathVariable Long teamId) {
         return matchService.findMatchesByTeam(teamId);
+    }
+
+    @GetMapping("/tournament/{tournamentId}")
+    public  List<MatchOutputDTO> getMatchesByTournament(@PathVariable Long tournamentId) {
+        return matchService.findAllByTournamentId(tournamentId);
     }
 }
