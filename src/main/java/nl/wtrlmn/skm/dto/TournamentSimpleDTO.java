@@ -9,6 +9,7 @@ public class TournamentSimpleDTO {
     private String imgProfile;
     private LocalDate startDate;
     private LocalDate endDate;
+    private String city;
 
     public Long getId() {
         return id;
@@ -48,5 +49,13 @@ public class TournamentSimpleDTO {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

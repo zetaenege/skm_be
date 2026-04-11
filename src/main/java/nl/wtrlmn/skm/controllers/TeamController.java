@@ -20,32 +20,28 @@ public class TeamController {
 
     @GetMapping
     public List<TeamOutputDTO> getAllTeams() {
+
         return teamService.findAllAsDTOs();
     }
 
     @GetMapping("/{id}")
     public TeamOutputDTO getTeamById(@PathVariable Long id) {
-        return teamService.findById(id)
-                .map(teamService::convertToTeamOutputDTO)
-                .orElseThrow(() -> new IllegalArgumentException("Team not found with id: " + id));
+                return teamService.findByIdDTO(id);
     }
 
     @PostMapping
     public TeamOutputDTO createTeam(@RequestBody TeamInputDTO teamInputDTO) {
-        return teamService.convertToTeamOutputDTO(
-                teamService.createTeamFromDTO(teamInputDTO)
-        );
+        return teamService.createTeam(teamInputDTO);
     }
 
     @PutMapping("/{id}")
     public TeamOutputDTO updateTeam(@PathVariable Long id, @RequestBody TeamInputDTO teamInputDTO) {
-        return teamService.convertToTeamOutputDTO(
-                teamService.updateTeamFromDTO(id, teamInputDTO)
-        );
+        return teamService.updateTeamFromDTO(id, teamInputDTO);
     }
 
     @DeleteMapping("/{id}")
     public void deleteTeam(@PathVariable Long id) {
+
         teamService.deleteById(id);
     }
 }

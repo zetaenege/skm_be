@@ -5,6 +5,9 @@ public class TeamSimpleDTO {
     private Long id;
     private String name;
     private String imgProfile;
+    private String city;
+    private TournamentSimpleDTO tournament;
+
 
     public String getCity() {
         return city;
@@ -38,6 +41,11 @@ public class TeamSimpleDTO {
         this.id = id;
     }
 
-    private String city;
+    public TournamentSimpleDTO getTournament() {
+        return tournament;
+    }
 
+    public void setTournament(TournamentSimpleDTO tournament) {
+        this.tournament = tournament;
+    }
 }

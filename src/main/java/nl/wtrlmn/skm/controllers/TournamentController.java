@@ -1,13 +1,15 @@
 package nl.wtrlmn.skm.controllers;
 
 import nl.wtrlmn.skm.dto.TournamentInputDTO;
+import nl.wtrlmn.skm.dto.TournamentOutputDTO;
+import nl.wtrlmn.skm.dto.TournamentSimpleDTO;
 import nl.wtrlmn.skm.models.Tournament;
 import nl.wtrlmn.skm.services.TournamentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tournaments")
@@ -17,22 +19,32 @@ public class TournamentController {
     private TournamentService tournamentService;
 
     @GetMapping
-    public List<Tournament> getAllTournaments() {
+    public List<TournamentSimpleDTO> getAllTournaments() {
         return tournamentService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Optional<Tournament> getTournamentById(@PathVariable Long id) {
+    public TournamentOutputDTO getTournamentById(@PathVariable Long id) {
+
         return tournamentService.findById(id);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<TournamentOutputDTO>> searchTournaments(@RequestParam String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+        List<TournamentOutputDTO> results = tournamentService.searchGlobal(query);
+        return ResponseEntity.ok(results);
+    }
+
     @PostMapping(consumes = "application/json")
-    public Tournament createTournament(@RequestBody TournamentInputDTO tournamentInputDTO) {
+    public TournamentSimpleDTO createTournament(@RequestBody TournamentInputDTO tournamentInputDTO) {
         return tournamentService.createTournamentFromDTO(tournamentInputDTO);
     }
 
     @PutMapping("/{id}")
-    public Tournament updateTournament(@PathVariable Long id, @RequestBody TournamentInputDTO tournamentInputDTO) {
+    public TournamentOutputDTO updateTournament(@PathVariable Long id, @RequestBody TournamentInputDTO tournamentInputDTO) {
         return tournamentService.updateTournamentFromDTO(id, tournamentInputDTO);
     }
 
@@ -42,8 +54,20 @@ public class TournamentController {
     }
 
     @PostMapping("/{tournamentId}/generate-matches")
-    public String generateMatches(@PathVariable Long tournamentId) {
-        tournamentService.generateMatchesForTournament(tournamentId);
-        return "Matches generated for tournament with id: " + tournamentId;
+    public ResponseEntity<?> generateMatches(@PathVariable Long tournamentId) {
+        try {
+            tournamentService.generateMatchesForTournament(tournamentId);
+
+            return ResponseEntity.ok("Matches generated successfully for tournament: " + tournamentId);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/active")
+    public List<TournamentOutputDTO> getActiveTournaments() {
+        return tournamentService.findAllDTOs().stream()
+                .filter(TournamentOutputDTO::isActive)
+                .toList();
     }
 }

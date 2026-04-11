@@ -9,7 +9,33 @@ public class TournamentOutputDTO {
     private String imgProfile;
     private LocalDate startDate;
     private LocalDate endDate;
-    private List<TeamSimpleDTO> teams;
+    private boolean active;
+    private String city;
+    private List<TeamOutputDTO> teams;
+
+    public String getCity() {
+        return city;
+    }
+
+    public List<TeamOutputDTO> getTeams() {
+        return teams;
+    }
+
+    public void setTeams(List<TeamOutputDTO> teams) {
+        this.teams = teams;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 
     public Long getId() {
         return id;
@@ -51,11 +77,6 @@ public class TournamentOutputDTO {
         this.endDate = endDate;
     }
 
-    public List<TeamSimpleDTO> getTeams() {
-        return teams;
-    }
 
-    public void setTeams(List<TeamSimpleDTO> teams) {
-        this.teams = teams;
-    }
+
 }

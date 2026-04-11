@@ -1,12 +1,12 @@
 package nl.wtrlmn.skm.controllers;
 
+import nl.wtrlmn.skm.dto.MatchOutputDTO;
 import nl.wtrlmn.skm.models.Match;
 import nl.wtrlmn.skm.services.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/matches")
@@ -16,28 +16,46 @@ public class MatchController {
     private MatchService matchService;
 
     @GetMapping
-    public List<Match> getAllMatches() {
+    public List<MatchOutputDTO> getAllMatches() {
         return matchService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Optional<Match> getMatchById(@PathVariable Long id) {
-        return matchService.findById(id);
+    public MatchOutputDTO getMatchById(@PathVariable Long id) {
+
+        return matchService.findByIdDTO(id);
     }
 
     @PostMapping
-    public Match createMatch(@RequestBody Match match) {
-        return matchService.save(match);
+    public MatchOutputDTO createMatch(@RequestBody Match match) {
+
+        return matchService.saveFromDTO(match);
     }
 
     @PutMapping("/{id}")
-    public Match updateMatch(@PathVariable Long id, @RequestBody Match match) {
-        match.setId(id);
-        return matchService.save(match);
+    public MatchOutputDTO updateMatch(@PathVariable Long id, @RequestBody Match matchData) {
+
+        return matchService.updateMatchResult(
+                id,
+                matchData.getTeamHomeScore(),
+                matchData.getTeamAwayScore(),
+                matchData.getStatus()
+        );
     }
 
     @DeleteMapping("/{id}")
     public void deleteMatch(@PathVariable Long id) {
+
         matchService.deleteById(id);
+    }
+
+    @GetMapping("/team/{teamId}")
+    public  List<MatchOutputDTO> getMatchesByTeam(@PathVariable Long teamId) {
+        return matchService.findMatchesByTeam(teamId);
+    }
+
+    @GetMapping("/tournament/{tournamentId}")
+    public  List<MatchOutputDTO> getMatchesByTournament(@PathVariable Long tournamentId) {
+        return matchService.findAllByTournamentId(tournamentId);
     }
 }

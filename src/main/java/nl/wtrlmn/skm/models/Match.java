@@ -43,9 +43,15 @@ public class Match {
     @Column(name = "team_away_score")
     private int teamAwayScore;
 
+    @Column(name = "status")
+    private String status;
 
 
-    // Asignacion de puntos a los equipos
+
+
+
+
+
     private void assignPoints(Team winner, Team loser, int winnerPoints, int loserPoints,
                               boolean won, boolean drawn, boolean lost) {
         if (teamHome == winner) {
@@ -86,7 +92,8 @@ public class Match {
 
 
 
-    // Getters and setters
+
+
 
     public Long getId() {
         return id;
@@ -126,6 +133,13 @@ public class Match {
 
     public void setTeamHome(Team teamHome) {
         this.teamHome = teamHome;
+    }
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public int getTeamHomePoints() {

@@ -7,12 +7,29 @@ public class UserOutputDTO {
     private String email;
     private String imgProfile;
     private String position;
+    private int matchesPlayed;
     private boolean isCoach;
     private boolean isAdmin;
     private Long teamId;
     private Long tournamentId;
 
     // Getters & Setters
+
+    public int getMatchesPlayed() {
+        return matchesPlayed;
+    }
+
+    public void setMatchesPlayed(int matchesPlayed) {
+        this.matchesPlayed = matchesPlayed;
+    }
+
+    public Long getTournamentId() {
+        return tournamentId;
+    }
+
+    public void setTournamentId(Long tournamentId) {
+        this.tournamentId = tournamentId;
+    }
 
     public Long getId() {
         return id;
@@ -78,11 +95,4 @@ public class UserOutputDTO {
         this.teamId = teamId;
     }
 
-    public Long getTournamentId() {
-        return tournamentId;
-    }
-
-    public void setTournamentId(Long tournamentId) {
-        this.tournamentId = tournamentId;
-    }
 }

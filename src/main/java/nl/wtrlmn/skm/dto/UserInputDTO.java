@@ -1,18 +1,21 @@
 package nl.wtrlmn.skm.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class UserInputDTO {
 
     private String name;
     private String email;
     private String position;
+    @JsonProperty("isCoach")
     private boolean isCoach;
+
+    @JsonProperty("isAdmin")
     private boolean isAdmin;
     private Long teamId;
-    public Long tournamentId;
-    public String password;
-    public String imgProfile;
+    private String password;
+    private String imgProfile;
 
-    //  G & S
 
 
     public String getName() {
@@ -61,14 +64,6 @@ public class UserInputDTO {
 
     public void setTeamId(Long teamId) {
         this.teamId = teamId;
-    }
-
-    public Long getTournamentId() {
-        return tournamentId;
-    }
-
-    public void setTournamentId(Long tournamentId) {
-        this.tournamentId = tournamentId;
     }
 
     public String getPassword() {
