@@ -52,7 +52,6 @@ public class Match {
 
 
 
-    // Asignacion de puntos a los equipos
     private void assignPoints(Team winner, Team loser, int winnerPoints, int loserPoints,
                               boolean won, boolean drawn, boolean lost) {
         if (teamHome == winner) {
@@ -93,7 +92,7 @@ public class Match {
 
 
 
-    // Getters and setters
+
 
 
     public Long getId() {

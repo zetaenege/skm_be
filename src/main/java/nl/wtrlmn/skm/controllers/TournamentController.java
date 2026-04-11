@@ -3,13 +3,13 @@ package nl.wtrlmn.skm.controllers;
 import nl.wtrlmn.skm.dto.TournamentInputDTO;
 import nl.wtrlmn.skm.dto.TournamentOutputDTO;
 import nl.wtrlmn.skm.dto.TournamentSimpleDTO;
+import nl.wtrlmn.skm.models.Tournament;
 import nl.wtrlmn.skm.services.TournamentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tournaments")
@@ -27,6 +27,15 @@ public class TournamentController {
     public TournamentOutputDTO getTournamentById(@PathVariable Long id) {
 
         return tournamentService.findById(id);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<TournamentOutputDTO>> searchTournaments(@RequestParam String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+        List<TournamentOutputDTO> results = tournamentService.searchGlobal(query);
+        return ResponseEntity.ok(results);
     }
 
     @PostMapping(consumes = "application/json")

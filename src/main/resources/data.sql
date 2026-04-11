@@ -1,11 +1,8 @@
--- 1. LIMPIEZA
 TRUNCATE TABLE users, teams, tournaments RESTART IDENTITY CASCADE;
 
--- 2. TORNEO (ID 10)
 INSERT INTO tournaments (id, name, start_date, end_date,city)
 VALUES (10, 'Torneo Apertura 2026',  '2026-01-31', '2026-12-31', 'Caracas');
 
--- 3. EQUIPOS (IDs del 10 al 15)
 INSERT INTO teams (id, name, city, tournament_id, points, matches, win, draw, lost) VALUES
                                                                                         (10, 'Team 1', 'Ciudad A', 10, 0, 0, 0, 0, 0),
                                                                                         (11, 'Team 2', 'Ciudad B', 10, 0, 0, 0, 0, 0),
@@ -13,7 +10,6 @@ INSERT INTO teams (id, name, city, tournament_id, points, matches, win, draw, lo
 
 
 INSERT INTO users (user_id, name, email, password, position, is_coach, is_admin, team_id, img_profile) VALUES
-                                                                                                           -- Jugadores Team 1 (ID 10)
                                                                                                            (10, 'Carlos Delantero', 'carlos@team1.com', '$2a$12$R9h/lSAbv.55G.CDU6vPue0YlJ6D1vOEq3pLQ6yUscKSeBInXWv6.', 'Delantero', false, false, 10, 'https://api.dicebear.com/7.x/avataaars/svg?seed=Carlos'),
                                                                                                            (11, 'Juan Portero', 'juan@team1.com', '$2a$12$R9h/lSAbv.55G.CDU6vPue0YlJ6D1vOEq3pLQ6yUscKSeBInXWv6.', 'Portero', false, false, 10, 'https://api.dicebear.com/7.x/avataaars/svg?seed=Juan'),
 

@@ -9,7 +9,6 @@ public class TeamInputDTO {
 
 
 
-    // G & S
     public String getName() {
         return name;
     }

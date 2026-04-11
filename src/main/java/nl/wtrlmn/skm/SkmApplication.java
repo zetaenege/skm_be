@@ -22,7 +22,7 @@ public class SkmApplication {
             String email = "admin@example.com";
             if (userRepository.findByEmail(email).isEmpty()) {
                 User admin = new User();
-                admin.setName("Levo D'agosto");
+                admin.setName("Super Admin");
                 admin.setEmail(email);
                 admin.setPassword(passwordEncoder.encode("admin123"));
                 admin.setAdmin(true);
@@ -31,9 +31,9 @@ public class SkmApplication {
                 admin.setPosition("Administrator");
                 admin.setTeam(null);
                 userRepository.save(admin);
-                System.out.println("✅ Admin creado: " + email + " / admin123");
+                System.out.println("Admin: " + email + " / admin123");
             } else {
-                System.out.println("ℹ️ Admin ya existe: " + email);
+                System.out.println("Account with this email already exist: " + email);
             }
         };
     }

@@ -20,7 +20,7 @@ public class Tournament {
     @Column(nullable = false, name = "name")
     private String name;
 
-    @Column(name = "img_profile")
+    @Column(name = "img_profile", columnDefinition = "TEXT")
     private String imgProfile;
 
 
@@ -33,7 +33,6 @@ public class Tournament {
     @Column(name = "city")
     private String city;
 
-    // Relaciones con otras entidades
     @OneToMany(
             mappedBy = "tournament",
             cascade = CascadeType.ALL,

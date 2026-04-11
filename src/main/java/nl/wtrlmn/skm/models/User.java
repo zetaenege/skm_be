@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-
 @Entity
 @Table(name = "users")
 public class User {
@@ -25,7 +24,7 @@ public class User {
     @Column(nullable = false, unique = true, name = "email")
     private String email;
 
-    @Column(name = "img_profile")
+    @Column(name = "img_profile", columnDefinition = "TEXT")
     private String imgProfile;
 
     @Column(name = "position")
@@ -41,15 +40,16 @@ public class User {
     @JoinColumn(name = "team_id")
     private Team team;
 
+    @OneToOne(mappedBy = "captain")
+    private Team captainOf;
 
     @NotBlank(message = "La contraseña no puede estar vacía.")
     @Column(nullable = false, name = "password")
     private String password;
 
-    // Constructores
     public User() {}
 
-    public User(String name, String email, String position, boolean isCoach, boolean isAdmin, Team team, Tournament tournament, String password, String imgProfile) {
+    public User(String name, String email, String position, boolean isCoach, boolean isAdmin, Team team, String password, String imgProfile) {
         this.name = name;
         this.email = email;
         this.position = position;
@@ -60,7 +60,7 @@ public class User {
         this.imgProfile = imgProfile;
     }
 
-    // Getters y Setters
+
 
     public Long getId() {
         return id;
@@ -116,6 +116,14 @@ public class User {
 
     public void setTeam(Team team) {
         this.team = team;
+    }
+
+    public Team getCaptainOf() {
+        return captainOf;
+    }
+
+    public void setCaptainOf(Team captainOf) {
+        this.captainOf = captainOf;
     }
 
     public String getPassword() {

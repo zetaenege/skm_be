@@ -55,7 +55,6 @@ public class TeamService {
         teamRepository.deleteById(id);
     }
 
-    // --- MÉTODO CORREGIDO ---
     public TeamOutputDTO convertToTeamOutputDTO(Team team) {
         TeamOutputDTO dto = new TeamOutputDTO();
         dto.setId(team.getId());
@@ -63,19 +62,16 @@ public class TeamService {
         dto.setImgProfile(team.getImgProfile());
         dto.setCity(team.getCity());
 
-        // 1. SQUAD
         if (team.getSquad() != null) {
             List<UserOutputDTO> squadDTOs = team.getSquad().stream().map(user -> {
                 UserOutputDTO uDto = userService.convertToUserOutputDTO(user);
-                // Si quieres calcular partidos del jugador en el futuro, hazlo aquí.
-                // Por ahora, si UserOutputDTO tiene matchesPlayed, ponle 0 o busca la lógica.
                 uDto.setMatchesPlayed(0);
                 return uDto;
             }).toList();
             dto.setSquad(squadDTOs);
         }
 
-        // 2. ESTADÍSTICAS (POSITION TABLE)
+
         int played = 0;
         int won = 0;
         int drawn = 0;
@@ -83,14 +79,12 @@ public class TeamService {
         int goalsFor = 0;
         int goalsAgainst = 0;
 
-        // A. Procesar partidos como LOCAL (Home)
         if (team.getMatchesHome() != null) {
             for (Match m : team.getMatchesHome()) {
                 // Solo contamos si el partido terminó
                 if ("FINISHED".equalsIgnoreCase(m.getStatus())) {
                     played++;
 
-                    // AL SER INT, LOS USAMOS DIRECTAMENTE (Ya no hay error de != null)
                     int hScore = m.getTeamHomeScore();
                     int aScore = m.getTeamAwayScore();
 
@@ -104,7 +98,6 @@ public class TeamService {
             }
         }
 
-        // B. Procesar partidos como VISITANTE (Away)
         if (team.getMatchesAway() != null) {
             for (Match m : team.getMatchesAway()) {
                 if ("FINISHED".equalsIgnoreCase(m.getStatus())) {
@@ -113,8 +106,6 @@ public class TeamService {
                     int hScore = m.getTeamHomeScore();
                     int aScore = m.getTeamAwayScore();
 
-                    // OJO: Si soy visitante, mis goles a favor son los de Away (aScore)
-                    // Y mis goles en contra son los del Local (hScore)
                     goalsFor += aScore;
                     goalsAgainst += hScore;
 
@@ -125,7 +116,6 @@ public class TeamService {
             }
         }
 
-        // C. Asignar cálculos al DTO
         dto.setMatchesPlayed(played);
         dto.setWon(won);
         dto.setDrawn(drawn);
@@ -133,7 +123,7 @@ public class TeamService {
         dto.setGoalsFor(goalsFor);
         dto.setGoalsAgainst(goalsAgainst);
         dto.setGoalDifference(goalsFor - goalsAgainst);
-        dto.setPoints((won * 3) + drawn); // 3 ptos victoria, 1 pto empate
+        dto.setPoints((won * 3) + drawn);
 
         return dto;
     }

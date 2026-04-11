@@ -12,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class UserService {

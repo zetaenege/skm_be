@@ -1,11 +1,7 @@
 package nl.wtrlmn.skm.models;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-
 
 @Entity
 @Table(name = "teams")
@@ -19,17 +15,20 @@ public class Team {
     @Column(nullable = false, name = "name")
     private String name;
 
-    @Column(name = "img_profile")
+    @Column(name = "img_profile", columnDefinition = "TEXT")
     private String imgProfile;
 
     @Column(nullable = false, name = "city")
     private String city;
 
+    @OneToOne
+    @JoinColumn(name = "captain_id")
+    private User captain;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tournament_id", nullable = false)
     private Tournament tournament;
 
-    // La lista de jugadores del equipo (squad)
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<User> squad = new ArrayList<>();
 
@@ -48,15 +47,12 @@ public class Team {
     @Column(name = "lost")
     private int matchesLost = 0;
 
-    // Relación con partidos jugados como local
     @OneToMany(mappedBy = "teamHome", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Match> matchesHome = new ArrayList<>();
 
-    // Relación con partidos jugados como visitante
     @OneToMany(mappedBy = "teamAway", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Match> matchesAway = new ArrayList<>();
 
-    // Métodos para actualizar estadísticas
     public void updateStatistics(int points, boolean won, boolean drawn, boolean lost) {
         this.pointsTotal += points;
         this.matchesPlayed++;
@@ -65,7 +61,6 @@ public class Team {
         if (lost) this.matchesLost++;
     }
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -96,6 +91,14 @@ public class Team {
 
     public void setCity(String city) {
         this.city = city;
+    }
+
+    public User getCaptain() {
+        return captain;
+    }
+
+    public void setCaptain(User captain) {
+        this.captain = captain;
     }
 
     public Tournament getTournament() {

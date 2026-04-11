@@ -11,7 +11,6 @@ public class TournamentInputDTO {
     private String city;
 
 
-    // G & S
 
 
     public String getCity() {
