@@ -1,3 +1,4 @@
+
 TRUNCATE TABLE users, teams, tournaments RESTART IDENTITY CASCADE;
 
 INSERT INTO tournaments (id, name, start_date, end_date,city)
